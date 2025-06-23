@@ -8,7 +8,7 @@ else
 end
 
 local udp = sock.udp()
-udp:setsockname(address, 12345)
+print(udp:setsockname(address, 12345))
 
 local data, msg_or_ip, port_or_nil
 
