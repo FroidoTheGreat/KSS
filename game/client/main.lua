@@ -2,12 +2,7 @@ local sock = require 'socket'
 
 local udp
 
-local address, port
-if false then
-	address, port = 'localhost', 12345
-else
-	address, port = '165.232.141.132', 12345
-end
+local address, port = '165.232.141.132', 12345
 
 function love.load()
 	udp = sock.udp()
