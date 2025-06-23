@@ -1,7 +1,11 @@
+print('starting server') 
+
+io.stdout:setvbuf("no")
+
 local sock = require 'socket'
 
 local address
-if false then
+if true then
 	address = 'localhost'
 else
 	address = '0.0.0.0'
