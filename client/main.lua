@@ -1,28 +1,50 @@
-local sock = require 'socket'
+local net = require 'net'
+local render = require 'render'
+local v = require 'Vector'
 
+local World = require 'World'
+local Player = require 'objects/Player'
+
+local world
+local player
+
+local client
 local udp
+local tcp
 
-local address, port
-if false then
-	address, port = 'localhost', 12345
-else
-	address, port = '165.232.141.132', 12345
-end
+local CONNECTED = false
+local STARTED = false
 
 function love.load()
-	udp = sock.udp()
+	net.load()
+	udp = net.udp
+	tcp = net.tcp
 
-	udp:settimeout(0)
+	client = require 'client'
 
-	udp:setpeername(address, port)
-
-	udp:send('oh hi mark!')
+	client.load()
 end
 
 function love.update(dt)
+	if STARTED then
+		if world then
+			world:update(dt)
+		end
+	elseif CONNECTED then
 
+	else
+		client.request_connection(dt)
+	end
 end
 
 function love.draw()
-	
+	if STARTED then
+		if world then
+			render.draw(world)
+		end
+	elseif CONNECTED then
+		love.graphics.print("waiting for players...", 10, 10)
+	else
+		love.graphics.print("waiting for server connection...", 10, 10)
+	end
 end
