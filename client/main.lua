@@ -20,7 +20,7 @@ function love.load()
 	udp = net.udp
 	tcp = net.tcp
 
-	client = require 'client'
+	client = require 'client_network'
 
 	client.load()
 end

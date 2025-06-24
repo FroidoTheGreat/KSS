@@ -3,6 +3,8 @@ local v = require 'Vector'
 local Player = Object:extend()
 
 function Player:new(t)
+	self.typ = 'player'
+
 	if type(t) ~= 'table' then
 		return
 	end
@@ -19,10 +21,6 @@ function Player:update(dt)
 	if self.pos.x > 500 then
 		self.pos.x = 100
 	end
-end
-
-function Player:draw()
-	love.graphics.circle('fill', self.pos.x, self.pos.y, 20)
 end
 
 return Player

@@ -15,4 +15,12 @@ function net.load()
 	net.tcp = net.sock.tcp()
 end
 
+function net.send_udp(s, address)
+	net.udp:send(s, address)
+end
+
+function net.send_udp(s, address)
+	net.tcp:send(s, address)
+end
+
 return net

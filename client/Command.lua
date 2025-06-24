@@ -2,9 +2,8 @@ local Object = require 'Object'
 local serpent = require 'serpent'
 local Command = Object:extend()
 
-function Command:new(datagram, ip, port)
-	self.ip = ip or 0
-	self.port = port or 0
+function Command:new(datagram, address)
+	self.address = address
 
 	ok, self.data = serpent.load(datagram)
 	self.err = not ok
@@ -19,7 +18,7 @@ function Command:new(datagram, ip, port)
 end
 
 function Command:print()
-	print('received command from ' .. self.ip .. ':' .. self.port)
+	print('received command from ' .. self.address.ip .. ':' .. self.address.port)
 	print('- ' .. self.header .. ' -')
 end
 
