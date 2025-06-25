@@ -2,6 +2,7 @@ local client = {}
 
 local net = require 'net'
 local serpent = require 'serpent'
+local Update = require 'Update'
 
 local ip, port
 if net.settings.localhost then
@@ -36,6 +37,20 @@ function client.request_connection(dt)
 	}
 	local datagram = serpent.dump(data)
 	udp:send(datagram)
+end
+
+function client.receive_updates()
+	local data, msg
+	local cmds = {}
+
+	repeat
+		data, msg = net.udp:receive()
+		if data then
+			table.insert(cmds, Update(data))
+		end
+	until not data
+
+	return cmds
 end
 
 return client

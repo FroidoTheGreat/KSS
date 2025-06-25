@@ -1,3 +1,4 @@
 return {
-	localhost = true
+	localhost = false,
+	num_players = 2
 }

@@ -1,11 +1,12 @@
 local Object = require 'Object'
 local net = require 'net'
-local serp = require 'serpent'
+local serpent = require 'serpent'
 local WorldState = Object:extend()
 
 function WorldState:new(world, settings)
+	settings = settings or {}
 	self.settings = settings
-	self.data = {H = 'update' or settings.header}
+	self.data = {H = settings.header or 'update'}
 	local items = world.items
 	self.data.items = {}
 
@@ -17,19 +18,11 @@ function WorldState:new(world, settings)
 			datum.typ = object.typ
 		end
 		if object.pos then
-			datum.x = object.x
-			datum.y = object.y
+			datum.x = object.pos.x
+			datum.y = object.pos.y
 		end
-	end
-end
 
-function WorldState:send(address)
-	local datagram = serpent.dump(self.data)
-
-	if (self.data.H == 'load') then
-		net.send_tcp(datagram, address)
-	else
-		net.send_udp(datagram, address)
+		table.insert(self.data.items, datum)
 	end
 end
 
