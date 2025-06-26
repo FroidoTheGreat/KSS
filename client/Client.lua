@@ -7,7 +7,6 @@ function Client:new(address, tcp)
 	self.tcp = tcp
 
 	self.address = address
-	self.player_id = player_id
 
 	self.controls = {
 		LEFT = false,
@@ -19,13 +18,17 @@ end
 
 function Client:assign_player(player)
 	self.player = player
+	self:send_udp({
+		H = 'me',
+		id = player.id
+	})
 end
 
 function Client:send_udp(datagram)
 	if type(datagram) == 'table' then
 		datagram = serpent.dump(datagram)
 	end
-	net.udp:sendto(datagram, self.address.ip, self.address.port)
+	net.sendto(datagram, self.address)
 end
 
 function Client:resolve_command(cmd)

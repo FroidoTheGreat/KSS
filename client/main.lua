@@ -40,6 +40,17 @@ function love.update(dt)
 
 	if STARTED then
 		if world then
+			if world.me_id and not world.me then
+				local player = world:find_by_id(world.me_id)
+
+				if player and player.typ == 'player' then
+					world.me = player
+					player.controls = controller.actions
+				else
+					print('no player object matching player id')
+				end
+			end
+
 			world:update(dt)
 		end
 	elseif CONNECTED then

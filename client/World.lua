@@ -1,6 +1,7 @@
 local Object = require 'Object'
 local Player = require 'objects/Player'
 local WorldState = require 'WorldState'
+local controller = require 'controller'
 local v = require 'Vector'
 local World = Object:extend()
 

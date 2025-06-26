@@ -1,5 +1,3 @@
--- io.stdout:setvbuf("no")
-
 print('starting server...')
 
 local net = require 'net'
@@ -9,6 +7,21 @@ local Address = require 'Address'
 local Client = require 'Client'
 local World = require 'World'
 local Player = require 'objects/Player'
+local clients = require 'client_manager'
+local game = require 'server_logic'
+
+-- game initiation
+game.init()
+
+-- when run in a thread
+local channel
+if love then
+	channel = {}
+	channel.input = love.thread.getChannel('input')
+	channel.output = love.thread.getChannel('output')
+	channel.connected = false
+	net.host(nil, channel.input, channel.output)
+end
 
 -- testing environment?
 local ip
@@ -25,62 +38,51 @@ local tcp = net.tcp
 udp:setsockname(ip, 12345)
 udp:settimeout(0)
 
-local RUN = true
-local STARTED = false
-
+-- clients
 local NUM_PLAYERS = net.settings.num_players
-local clients = {}
-function clients:get(address)
-	for _, client in ipairs(self) do
-		if client.address.ip == address.ip and client.address.port == address.port then
-			return client
-		end
-	end
-end
+clients.load()
 
-local game = {}
-
+-- the world
 local world
 
-local tic_timer = 0
-local tic_rate = 1/60
-local tic_last_time = net.sock.gettime()
+-- timers
+local time
+local last_time = net.sock.gettime()
+local dt
 
+local tic_timer = 0
 local update_timer = 0
+local tic_rate = 1/60
 local update_rate = 1/60
-local update_last_time = net.sock.gettime()
 
 -- mainloop
-function game.load()
-	STARTED = true
-
-	world = World()
-	for _, client in ipairs(clients) do
-		local player = Player({
-			x = math.random(30, 400),
-			y = math.random(30, 400),
-			controls = client.controls
-		})
-		world:add(player)
-		client:assign_player(player)
-	end
-	local load_state = world:new_state({header='load'}).data
-
-	for _, client in ipairs(clients) do
-		client:send_udp(load_state)
-	end
-end
-
-function game.update(dt)
-	world:update(dt)
-end
-
+local RUN = true
 while RUN do
 	-- collect messages
 	local data, ip, port
 	local cmds = {}
+
+	-- first from main thread (if applicable)
+	if channel then
+		if not channel.connected then
+			local msg = net.receive_from_thread()
+			if msg == 'host' then
+				channel.connected = true
+			end
+		end
+		if channel.connected then
+			local num_messages = channel.input:getCount()
+			for i=1, num_messages do
+				data = net.receive_from_thread()
+
+				local cmd = Command(data, Address(true))
+				table.insert(cmds, cmd)
+			end
+		end
+	end
+	-- then from udp
 	repeat
-		data, ip, port = udp:receivefrom()
+		data, ip, port = net.receive_from_udp()
 
 		if data then
 			local cmd = Command(data, Address(ip, port))
@@ -89,52 +91,49 @@ while RUN do
 			print('Network error: ' .. tostring(ip))
 		end
 	until not data
+	-- then from tcp (eventually)
 
 	-- resolve commands
 	for _, cmd in ipairs(cmds) do
 		local client
 		if cmd.header == 'connect' then
-			if STARTED then
-				udp:sendto(serpent.dump({H='rejected', reason='game started'}), cmd.address.ip, cmd.address.port)
+			if game.started then
+				net.sendto({H='rejected', reason='game started'}, address)
 			else
 				client = Client(cmd.address)
-				table.insert(clients, client)
-				udp:sendto(serpent.dump({H='connected'}), cmd.address.ip, cmd.address.port)
+				clients.add(client)
+				client:send_udp({H='connected'})
 				-- FIXME: don't let just anyone in
 			end
 		else
-			client = clients:get(cmd.address)
+			client = clients.get(cmd.address)
 			client:resolve_command(cmd)
 		end
 	end
 
 	-- control time and updates
-	local time = net.sock.gettime()
-	local dt = time - tic_last_time
+	time = net.sock.gettime()
+	dt = time - last_time
+	last_time = time
+	update_timer = update_timer + dt
 	tic_timer = tic_timer + dt
-	tic_last_time = time
 
-	update_timer = update_timer + (time - update_last_time)
-	update_last_time = time
+	if game.started then
+		while update_timer > update_rate do
+			update_timer = update_timer - update_rate
+			game.update(update_rate)
+		end
 
-	if STARTED then
-		if (tic_timer > tic_rate) then
+		if tic_timer > tic_rate then
 			tic_timer = tic_timer - tic_rate
-
-			local update_state = world:new_state().data
-			for _, client in ipairs(clients) do
+			local update_state = game.world:new_state().data
+			for _, client in ipairs(clients.clients) do
 				client:send_udp(update_state)
 			end
 		end
-
-		if (update_timer > update_rate) then
-			update_timer = update_timer - update_rate
-
-			game.update(dt)
-		end
-	elseif #clients >= NUM_PLAYERS then
+	elseif #clients.clients >= NUM_PLAYERS then
 		game.load()
 	end
 
-	net.sock.sleep(0.01)
+	net.sock.sleep(0.001)
 end

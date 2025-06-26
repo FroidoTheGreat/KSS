@@ -20,7 +20,43 @@ function net.send_udp(s)
 	if type(s) == 'table' then
 		s = serpent.dump(s)
 	end
-	net.udp:send(s)
+	if net.settings.p2p then
+		net.input:push(s)
+	else
+		net.udp:send(s)
+	end
+end
+
+function net.receive()
+	if net.settings.p2p then
+		return net.output:pop()
+	else
+		return net.udp:receive()
+	end
+end
+
+function net.receive_from_udp()
+	return net.udp:receivefrom()
+end
+function net.receive_from_thread()
+	return net.input:pop()
+end
+
+function net.sendto(s, address)
+	if type(s) == 'table' then
+		s = serpent.dump(s)
+	end
+	if address.host then
+		net.output:push(s)
+	else
+		net.udp:sendto(s, address.ip, address.port)
+	end
+end
+
+function net.host(thread, input, output) -- input means server input
+	net.thread = thread
+	net.input = input
+	net.output = output
 end
 
 return net

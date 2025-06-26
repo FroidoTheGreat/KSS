@@ -4,17 +4,32 @@ local net = require 'net'
 local serpent = require 'serpent'
 local Update = require 'Update'
 
+local udp
+
 local ip, port
-if net.settings.localhost then
+if net.settings.p2p then
+
+elseif net.settings.localhost then
 	ip, port = 'localhost', 12345
 else
 	ip, port = '165.232.141.132', 12345
 end
 
 function client.load()
-	udp = net.udp
-	udp:settimeout(0)
-	udp:setpeername(ip, port)
+	if net.settings.p2p then
+		local thread = love.thread.newThread('server.lua')
+		local input = love.thread.getChannel('input')
+		local output = love.thread.getChannel('output')
+
+		net.host(thread, input, output)
+		net.send_udp('host')
+
+		thread:start()
+	else
+		udp = net.udp
+		udp:settimeout(0)
+		udp:setpeername(ip, port)
+	end
 
 	-- connection requests
 	client.request_timer = 0
@@ -36,7 +51,7 @@ function client.request_connection(dt)
 		H = 'connect'
 	}
 	local datagram = serpent.dump(data)
-	udp:send(datagram)
+	net.send_udp(datagram)
 end
 
 function client.receive_updates()
@@ -44,9 +59,11 @@ function client.receive_updates()
 	local cmds = {}
 
 	repeat
-		data, msg = net.udp:receive()
+		data, msg = net.receive()
 		if data then
 			table.insert(cmds, Update(data))
+		else
+
 		end
 	until not data
 

@@ -18,6 +18,8 @@ function Update:new(datagram)
 end
 
 function Update:resolve(world)
+	local d = self.data
+	print(serpent.block(d))
 	if self.header == 'update' then
 		self:update(world)
 	elseif self.header == 'load' then
@@ -26,7 +28,11 @@ function Update:resolve(world)
 		net.connected = true
 	elseif self.header == 'rejected' then
 		net.rejected = true
-		net.rejection_reason = self.data.reason
+		net.rejection_reason = tostring(d.reason)
+	elseif self.header == 'me' then
+		if type(d.id) == 'number' then
+			world.me_id = d.id
+		end
 	else
 		print('unrecognized header: ' .. self.header)
 	end
@@ -51,7 +57,16 @@ function Update:update(world)
 		local object = world:find_by_id(datum.id)
 		if object then
 			if datum.x or datum.y then
-				object.pos = v(datum.x, datum.y or object.pos.y)
+				-- FIXME: make this smooth
+				local new_pos = v(datum.x or object.pos.x, datum.y or object.pos.y)
+				local old_pos = object.pos
+				local distance = (new_pos - old_pos):magnitude()
+				object.pos = new_pos
+			end
+			for k, v in pairs(object) do
+				if k ~= 'x' and k ~= 'y' and k ~= 'id' then
+					object[k] = v
+				end
 			end
 		end
 	end
