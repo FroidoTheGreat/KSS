@@ -1,5 +1,7 @@
 print('starting server...')
 
+math.randomseed(os.time())
+
 local objects = require 'objects'
 objects.load 'server'
 

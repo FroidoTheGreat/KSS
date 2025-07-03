@@ -14,6 +14,9 @@ end
 
 function World:add(object, id)
 	table.insert(self.items, object)
+	if object.post_load then
+		object:post_load()
+	end
 
 	if id then
 		object.id = id

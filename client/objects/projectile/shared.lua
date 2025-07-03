@@ -16,6 +16,8 @@ function Projectile:new(t)
 	self.speed = t.speed or 100
 
 	self.timer = t.timer or 1
+
+	self.owner_id = t.owner_id
 end
 
 function Projectile:update(dt)

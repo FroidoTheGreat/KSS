@@ -82,3 +82,8 @@ function love.draw()
 		love.graphics.print("waiting for server connection...", 10, 10)
 	end
 end
+
+function love.quit()
+	print('STOPPING GAME...')
+	print('\n\n\n')
+end

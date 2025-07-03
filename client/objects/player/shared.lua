@@ -24,7 +24,9 @@ function Player:new(t, y)
 
 	self.controls = t.controls
 
-	self.speed = 250 -- pps
+	self.speed = 300 -- pps
+
+	self.life = t.life or 100
 end
 
 local C = 1 / math.sqrt(2)

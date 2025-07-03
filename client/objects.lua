@@ -1,7 +1,8 @@
 local objects = {}
 local names = {
 	'player',
-	'projectile'
+	'projectile',
+	'boss'
 }
 
 local map = {}
@@ -16,11 +17,11 @@ function objects.load(typ)
 	for _, name in ipairs(names) do
 		local prefix = 'objects/'..name..'/'
 		map[name] = require(prefix..'shared')
-		map[name].post_update = require(prefix..typ).post_update
-		if typ == server then
-			-- add server methods
-		else
-			-- add client methods
+		local spec = require(prefix..typ)
+		for k, v in pairs(spec) do
+			if type(v) == 'function' then
+				map[name][k] = v
+			end
 		end
 	end
 end
