@@ -30,7 +30,7 @@ local renders = { -- FIXME: these will be required at some point from a 'draw' f
 }
 
 function render.draw(world)
-	for _, object in ipairs(world.items) do
+	for _, object in pairs(world.items) do
 		if (renders[object.typ]) then
 			renders[object.typ](object)
 		end

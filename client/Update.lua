@@ -74,6 +74,8 @@ function Update:update(world)
 				-- at this point the client should probably request a fix from the server
 				-- this would simply amount to asking the details of the object with this ID
 			end
+		else
+			print('no id for some reason')
 		end
 	end
 end

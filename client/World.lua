@@ -13,11 +13,6 @@ function World:new()
 end
 
 function World:add(object, id)
-	table.insert(self.items, object)
-	if object.post_load then
-		object:post_load()
-	end
-
 	if id then
 		object.id = id
 	else
@@ -25,24 +20,27 @@ function World:add(object, id)
 		next_id = next_id + 1
 	end
 
+	self.items[object.id] = object
+	if object.post_load then
+		object:post_load()
+	end
+
 	return object
 end
 
 function World:update(dt)
-	for _, object in ipairs(self.items) do
+	for _, object in pairs(self.items) do
 		if (object.update) then
 			object:update(dt, self)
 		end
 		if (object.post_update) then
 			object:post_update(dt, self)
 		end
-	end
 
-	for _, object in ipairs(self.items) do
 		if object.purge then
-			table.remove(self.items, _) -- FIXME: I can never remember how to do this properly
+			self.items[_] = nil
 		end
-	end 
+	end
 end
 
 function World:new_state(...)
@@ -50,11 +48,7 @@ function World:new_state(...)
 end
 
 function World:find_by_id(id)
-	for _, o in ipairs(self.items) do
-		if o.id == id then
-			return o
-		end
-	end
+	return self.items[id]
 end
 
 return World

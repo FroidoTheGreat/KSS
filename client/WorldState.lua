@@ -13,7 +13,7 @@ function WorldState:new(world, settings)
 
 	local last = settings.last
 
-	for _, object in ipairs(items) do
+	for _, object in pairs(items) do
 		local datum = {}
 
 		-- only update what is changed
@@ -70,7 +70,7 @@ function WorldState:new(world, settings)
 end
 
 function WorldState:find_by_id(id)
-	for _, item in ipairs(self.data.items) do
+	for _, item in pairs(self.data.items) do
 		if item.id == id then
 			return item
 		end
