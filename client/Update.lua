@@ -1,15 +1,17 @@
 local Object = require 'Object'
 local v = require 'Vector'
 local serpent = require 'serpent'
+local data = require 'data'
 local Update = Object:extend()
-local Player = require 'objects/Player'
 local net = require 'net'
 
-function Update:new(datagram)
-	ok, self.data = serpent.load(datagram)
+local objects = require('objects')
 
-	if (not ok) or type(self.data) ~= 'table' then
-		self.header = 'ERROR'
+function Update:new(datagram)
+	self.data = data.unpack(datagram)
+	-- print(serpent.block(self.data))
+
+	if (self.data.H == 'ERROR') or type(self.data) ~= 'table' then
 		self.data = {}
 		return
 	end
@@ -19,7 +21,6 @@ end
 
 function Update:resolve(world)
 	local d = self.data
-	print(serpent.block(d))
 	if self.header == 'update' then
 		self:update(world)
 	elseif self.header == 'load' then
@@ -34,18 +35,17 @@ function Update:resolve(world)
 			world.me_id = d.id
 		end
 	else
-		print('unrecognized header: ' .. self.header)
+		print('unrecognized header: ' .. tostring(self.header))
 	end
 end
 
 function Update:load(world)
 	for _, datum in ipairs(self.data.items) do
-		local class
-		if datum.typ == 'player' then
-			class = Player
-		else end
-		if class then
-			world:add(class(datum), datum.id)
+		if datum.typ and datum.id then
+			local class = objects.get(datum.typ)
+			if class then
+				world:add(class(datum), datum.id)
+			end
 		end
 	end
 
@@ -56,17 +56,23 @@ function Update:update(world)
 	for _, datum in ipairs(self.data.items) do
 		local object = world:find_by_id(datum.id)
 		if object then
-			if datum.x or datum.y then
-				-- FIXME: make this smooth
-				local new_pos = v(datum.x or object.pos.x, datum.y or object.pos.y)
-				local old_pos = object.pos
-				local distance = (new_pos - old_pos):magnitude()
-				object.pos = new_pos
-			end
-			for k, v in pairs(object) do
-				if k ~= 'x' and k ~= 'y' and k ~= 'id' then
-					object[k] = v
+			for k, value in pairs(datum) do
+				if k ~= 'id' then
+					if type(value) ~= 'table' then
+						object[k] = value
+					else
+						object[k] = v(value.x or 0, value.y or 0)
+					end
 				end
+			end
+		elseif datum.id then
+			local class = objects.get(datum.typ)
+			if class then
+				object = world:add(class(datum), datum.id)
+			else
+				print('WARNING: should have created object but type was blank')
+				-- at this point the client should probably request a fix from the server
+				-- this would simply amount to asking the details of the object with this ID
 			end
 		end
 	end

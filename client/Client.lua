@@ -12,7 +12,12 @@ function Client:new(address, tcp)
 		LEFT = false,
 		RIGHT = false,
 		UP = false,
-		DOWN = false
+		DOWN = false,
+		AB1 = {
+			p = false,
+			x = 0,
+			y = 0
+		}
 	}
 end
 
@@ -35,13 +40,25 @@ function Client:resolve_command(cmd)
 	local d = cmd.data
 	if d.H == 'act' then
 		if d.k then
-			self.controls[d.k] = true
+			if d.x then
+				self.controls[d.k] = {
+					p = true,
+					x = d.x,
+					y = d.y
+				}
+			else
+				self.controls[d.k] = true
+			end
 		else
 			print('received \'act\' command with no action ID')
 		end
 	elseif d.H == 'unact' then
 		if d.k then
-			self.controls[d.k] = false
+			if type(self.controls[d.k]) == 'table' then
+				self.controls[d.k].p = false
+			else
+				self.controls[d.k] = false
+			end
 		else
 			print('received \'unact\' command with no action ID')
 		end

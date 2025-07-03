@@ -1,21 +1,36 @@
 local C = {}
 local net = require 'net'
+local V = require 'Vector'
 
 C.actions = {
 	LEFT = false,
 	RIGHT = false,
 	UP = false,
-	DOWN = false
+	DOWN = false,
+	AB1 = {
+		p = false,
+		x = 0,
+		y = 0
+	}
 }
 
 C.keyboard = {
 	a = 'LEFT',
 	d = 'RIGHT',
 	w = 'UP',
-	s = 'DOWN',
+	s = 'DOWN'
 }
 
-function C.update()
+C.mouse = {
+	'AB1'
+}
+
+C.mouse_p = V(0, 0)
+
+function C.update(me)
+	-- can't do anything if we don't know who we are
+	if not me then return end
+
 	for k, v in pairs(C.keyboard) do
 		local isDown = love.keyboard.isDown(k)
 		if isDown ~= C.actions[v] then
@@ -26,6 +41,32 @@ function C.update()
 				H = H,
 				k = v
 			})
+		end
+	end
+	C.mouse_p = V(love.mouse.getPosition())
+	for button, v in pairs(C.mouse) do
+		local isDown = love.mouse.isDown(button)
+		local action = C.actions[v]
+		if true then
+			action.p = isDown
+			if isDown then
+				local dir = (C.mouse_p - me.pos):normal()
+				action.x, action.y = dir.x, dir.y
+				local msg = { -- FIXME: direction should be
+							  -- based on the absolute position of the mouse
+					H = 'act',
+					k = v,
+					x = action.x,
+					y = action.y
+				}
+				net.send_udp(msg)
+			else
+				local msg = {
+					H = 'unact',
+					k = v
+				}
+				net.send_udp(msg)
+			end
 		end
 	end
 end

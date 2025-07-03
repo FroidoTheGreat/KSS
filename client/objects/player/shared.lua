@@ -15,7 +15,7 @@ function Player:new(t, y)
 	end
 
 	if t.pos then
-		self.pos = pos
+		self.pos = v(t.pos.x, t.pos.y)
 	elseif t.x then
 		self.pos = v(t.x, t.y or 0)
 	else
@@ -46,6 +46,10 @@ function Player:update(dt)
 			self.pos = self.pos + v(0, -dt * self.speed)
 		elseif self.controls.DOWN then
 			self.pos = self.pos + v(0, dt * self.speed)
+		end
+
+		if self.controls.AB1 then
+
 		end
 	end
 end

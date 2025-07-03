@@ -2,9 +2,13 @@ local net = require 'net'
 local render = require 'render'
 local v = require 'Vector'
 
+local objects = require 'objects'
+objects.load 'client'
+
 local World = require 'World'
-local Player = require 'objects/Player'
 local controller = require 'controller'
+
+local Player = objects.get 'player'
 
 local world
 local player
@@ -47,7 +51,7 @@ function love.update(dt)
 					world.me = player
 					player.controls = controller.actions
 				else
-					print('no player object matching player id')
+					--print('no player object matching player id')
 				end
 			end
 
@@ -64,8 +68,10 @@ end
 
 function love.draw()
 	if STARTED then
-		controller.update()
 		if world then
+			if world.me then
+				controller.update(world.me)
+			end
 			render.draw(world)
 		end
 	elseif CONNECTED then

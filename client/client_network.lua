@@ -2,6 +2,7 @@ local client = {}
 
 local net = require 'net'
 local serpent = require 'serpent'
+local data = require 'data'
 local Update = require 'Update'
 
 local udp
@@ -47,25 +48,25 @@ function client.request_connection(dt)
 	client.request_timer = client.request_timer + client.request_timeout
 
 	-- send the request to the server
-	local data = {
+	local d = {
 		H = 'connect'
 	}
-	local datagram = serpent.dump(data)
+	local datagram = data.pack(d)
 	net.send_udp(datagram)
 end
 
 function client.receive_updates()
-	local data, msg
+	local d, msg
 	local cmds = {}
 
 	repeat
-		data, msg = net.receive()
-		if data then
-			table.insert(cmds, Update(data))
+		d, msg = net.receive()
+		if d then
+			table.insert(cmds, Update(d))
 		else
 
 		end
-	until not data
+	until not d
 
 	return cmds
 end

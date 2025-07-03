@@ -1,5 +1,6 @@
 local Object = require 'Object'
-local Player = require 'objects/Player'
+local objects = require 'objects'
+local Player = objects.get 'player'
 local WorldState = require 'WorldState'
 local controller = require 'controller'
 local v = require 'Vector'
@@ -20,14 +21,25 @@ function World:add(object, id)
 		object.id = next_id
 		next_id = next_id + 1
 	end
+
+	return object
 end
 
 function World:update(dt)
 	for _, object in ipairs(self.items) do
 		if (object.update) then
-			object:update(dt)
+			object:update(dt, self)
+		end
+		if (object.post_update) then
+			object:post_update(dt, self)
 		end
 	end
+
+	for _, object in ipairs(self.items) do
+		if object.purge then
+			table.remove(self.items, _) -- FIXME: I can never remember how to do this properly
+		end
+	end 
 end
 
 function World:new_state(...)

@@ -10,6 +10,7 @@ local net = {}
 net.sock = require 'socket'
 net.settings = require 'network_settings'
 local serpent = require 'serpent'
+local data = require 'data'
 
 function net.load()
 	net.udp = net.sock.udp()
@@ -18,7 +19,7 @@ end
 
 function net.send_udp(s)
 	if type(s) == 'table' then
-		s = serpent.dump(s)
+		s = data.pack(s)
 	end
 	if net.settings.p2p then
 		net.input:push(s)
@@ -44,7 +45,7 @@ end
 
 function net.sendto(s, address)
 	if type(s) == 'table' then
-		s = serpent.dump(s)
+		s = data.pack(s)
 	end
 	if address.host then
 		net.output:push(s)

@@ -1,5 +1,6 @@
 local World = require 'World'
-local Player = require 'objects/Player'
+local objects = require 'objects'
+local Player = objects.get 'player'
 local clients = require 'client_manager'
 local game = {}
 
@@ -21,10 +22,12 @@ function game.load()
 		game.world:add(player)
 		client:assign_player(player)
 	end
-	local load_state = game.world:new_state({header='load'}).data
+	local load_state = game.world:new_state({header='load'})
+	game.last_state = load_state
+
 
 	for _, client in ipairs(clients.clients) do
-		client:send_udp(load_state)
+		client:send_udp(load_state.data)
 	end
 end
 

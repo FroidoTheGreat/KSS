@@ -1,6 +1,7 @@
 local Object = require 'Object'
 local net = require 'net'
 local serpent = require 'serpent'
+local exports = require 'exports'
 local WorldState = Object:extend()
 
 function WorldState:new(world, settings)
@@ -10,19 +11,69 @@ function WorldState:new(world, settings)
 	local items = world.items
 	self.data.items = {}
 
+	local last = settings.last
+
 	for _, object in ipairs(items) do
 		local datum = {}
 
-		datum.id = object.id
-		if self.settings.header == 'load' then
-			datum.typ = object.typ
+		-- only update what is changed
+		if last or self.data.H == 'load' then
+			if last then
+				local other = last:find_by_id(object.id)
+			end
+			if not other then -- FIXME: this is where I can do delta compression in the future
+				datum.typ = object.typ
+			end
 		end
+			
+		-- include the basic necessities (defaults)
+		datum.id = object.id
 		if object.pos then
-			datum.x = object.pos.x
-			datum.y = object.pos.y
+			datum.pos = {
+				x = object.pos.x,
+				y = object.pos.y
+			}
+		end
+
+		-- include that which is shared between server and client
+		-- this handles things other than the default
+		if exports[object.typ] then
+			for _, export in ipairs(exports[object.typ]) do
+				local value = object[export]
+				if value then
+					if type(value) == 'table' and value.isVector then
+						datum[export] = {
+							x = value.x,
+							y = value.y
+						}
+					elseif type(value) ~= 'table' then
+						datum[export] = value
+					end
+				end
+			end
 		end
 
 		table.insert(self.data.items, datum)
+	end
+
+	last = last or {data={items={}}}
+	for _, object in ipairs(last.data.items) do -- FIXME: inefficient
+		if (not object.purge) and (not self:find_by_id(object.id)) then
+			local datum = {
+				id = object.id,
+				purge = true
+			}
+
+			table.insert(self.data.items, datum)
+		end
+	end
+end
+
+function WorldState:find_by_id(id)
+	for _, item in ipairs(self.data.items) do
+		if item.id == id then
+			return item
+		end
 	end
 end
 

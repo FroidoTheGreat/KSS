@@ -1,15 +1,14 @@
 local Object = require 'Object'
 local serpent = require 'serpent'
+local data = require 'data'
 local Command = Object:extend()
 
 function Command:new(datagram, address)
 	self.address = address
 
-	ok, self.data = serpent.load(datagram)
-	self.err = not ok
+	self.data = data.unpack(datagram)
 
-	if self.err then
-		self.header = 'ERROR'
+	if self.header == 'ERROR' then
 		self.data = {}
 		return
 	end

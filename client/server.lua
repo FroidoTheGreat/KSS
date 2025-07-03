@@ -1,12 +1,15 @@
 print('starting server...')
 
+local objects = require 'objects'
+objects.load 'server'
+
 local net = require 'net'
 local serpent = require 'serpent'
 local Command = require 'Command'
 local Address = require 'Address'
 local Client = require 'Client'
 local World = require 'World'
-local Player = require 'objects/Player'
+local Player = objects.get 'player'
 local clients = require 'client_manager'
 local game = require 'server_logic'
 
@@ -41,9 +44,6 @@ udp:settimeout(0)
 -- clients
 local NUM_PLAYERS = net.settings.num_players
 clients.load()
-
--- the world
-local world
 
 -- timers
 local time
@@ -98,7 +98,7 @@ while RUN do
 		local client
 		if cmd.header == 'connect' then
 			if game.started then
-				net.sendto({H='rejected', reason='game started'}, address)
+				net.sendto({H='rejected', reason='game started'}, cmd.address)
 			else
 				client = Client(cmd.address)
 				clients.add(client)
@@ -107,7 +107,9 @@ while RUN do
 			end
 		else
 			client = clients.get(cmd.address)
-			client:resolve_command(cmd)
+			if client then
+				client:resolve_command(cmd)
+			end
 		end
 	end
 
@@ -126,9 +128,12 @@ while RUN do
 
 		if tic_timer > tic_rate then
 			tic_timer = tic_timer - tic_rate
-			local update_state = game.world:new_state().data
+			local update_state = game.world:new_state({
+				last = game.last_state
+			})
+			game.last_state = update_state
 			for _, client in ipairs(clients.clients) do
-				client:send_udp(update_state)
+				client:send_udp(update_state.data)
 			end
 		end
 	elseif #clients.clients >= NUM_PLAYERS then
