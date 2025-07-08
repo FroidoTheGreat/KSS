@@ -10,6 +10,7 @@ local next_id = 1
 
 function World:new()
 	self.items = {}
+	self.players = {}
 end
 
 function World:add(object, id)
@@ -23,6 +24,10 @@ function World:add(object, id)
 	self.items[object.id] = object
 	if object.post_load then
 		object:post_load()
+	end
+
+	if object.typ == 'player' then
+		table.insert(self.players, object)
 	end
 
 	return object

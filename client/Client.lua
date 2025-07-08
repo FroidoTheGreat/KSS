@@ -19,6 +19,8 @@ function Client:new(address, tcp)
 			y = 0
 		}
 	}
+
+	self.timeout = 5
 end
 
 function Client:assign_player(player)
@@ -37,6 +39,8 @@ function Client:send_udp(datagram)
 end
 
 function Client:resolve_command(cmd)
+	self.timeout = 3
+	
 	local d = cmd.data
 	if d.H == 'act' then
 		if d.k then
@@ -62,6 +66,8 @@ function Client:resolve_command(cmd)
 		else
 			print('received \'unact\' command with no action ID')
 		end
+	elseif d.H == 'here' then
+
 	else
 		return false, 'unrecognized cmd header: ' .. d.H
 	end

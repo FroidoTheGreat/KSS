@@ -1,40 +1,37 @@
+local Color = require 'Color'
+local Canvas = require 'Canvas'
+local Sprite = require 'Sprite'
+local sprites = Sprite.sprites
+sprites.load()
+
 local render = {}
 
-local renders = { -- FIXME: these will be required at some point from a 'draw' folder
-	player = function(self)
-		love.graphics.circle('fill', self.pos.x, self.pos.y, 20)
+local plr = Sprite('chars.gold')
 
-		love.graphics.setColor(1, 0.5, 0.5, 1)
-		if self.life then
-			local width = math.max(0, self.life / 2)
-			love.graphics.rectangle('fill', self.pos.x - width/2, self.pos.y - 35, width, 5)
-		end
-		love.graphics.setColor(1, 1, 1, 1)
-	end,
-	projectile = function(self)
-		love.graphics.setColor(1, 0.5, 0.5, 1)
-		love.graphics.circle('fill', self.pos.x, self.pos.y, 10)
-		love.graphics.setColor(1, 1, 1, 1)
-	end,
-	boss = function(self)
-		love.graphics.circle('fill', self.pos.x, self.pos.y, 40)
-
-		love.graphics.setColor(1, 0.5, 0.5, 1)
-		love.graphics.circle('line', self.pos.x, self.pos.y, 43)
-		if self.life then
-			local width = math.max(0, self.life / 2)
-			love.graphics.rectangle('fill', self.pos.x - width/2, self.pos.y - 55, width, 5)
-		end
-		love.graphics.setColor(1, 1, 1, 1)
-	end
-}
+local clear_color = Color('36363d')
+local canvas = Canvas(400, 400)
+local bg = Sprite('backgrounds.1', {
+	no_center = true
+})
 
 function render.draw(world)
+	canvas:set()
+
+	clear_color:clear()
+
+	bg:draw(0, 0)
+
 	for _, object in pairs(world.items) do
-		if (renders[object.typ]) then
-			renders[object.typ](object)
+		if type(object.draw) == 'function' then
+			object:draw()
 		end
 	end
+
+	canvas:draw(100, 0, 1.5)
+end
+
+function render.getOffset()
+	return 100, 0, 1.5
 end
 
 return render

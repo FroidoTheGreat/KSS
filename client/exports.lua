@@ -1,13 +1,14 @@
 return {
 	player = {
-		'life'
+		'life',
+		'name',
 	},
 	projectile = {
-		'dir',
-		'speed'
+		'vel'
 	},
 	boss = {
 		'life',
-		'dir'
+		'dir',
+		'stage'
 	}
 }

@@ -27,7 +27,7 @@ C.mouse = {
 
 C.mouse_p = V(0, 0)
 
-function C.update(me)
+function C.update(me, offx, offy, scale)
 	-- can't do anything if we don't know who we are
 	if not me then return end
 
@@ -44,6 +44,8 @@ function C.update(me)
 		end
 	end
 	C.mouse_p = V(love.mouse.getPosition())
+	C.mouse_p = ((C.mouse_p - V(offx, offy)) / scale)
+
 	for button, v in pairs(C.mouse) do
 		local isDown = love.mouse.isDown(button)
 		local action = C.actions[v]

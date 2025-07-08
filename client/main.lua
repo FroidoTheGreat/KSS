@@ -1,3 +1,5 @@
+love.graphics.setDefaultFilter('nearest', 'nearest')
+
 local net = require 'net'
 local render = require 'render'
 local v = require 'Vector'
@@ -70,7 +72,7 @@ function love.draw()
 	if STARTED then
 		if world then
 			if world.me then
-				controller.update(world.me)
+				controller.update(world.me, render.getOffset())
 			end
 			render.draw(world)
 		end

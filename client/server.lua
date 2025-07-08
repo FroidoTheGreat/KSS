@@ -126,6 +126,18 @@ while RUN do
 		while update_timer > update_rate do
 			update_timer = update_timer - update_rate
 			game.update(update_rate)
+
+			local quit = true
+			for _, client in ipairs(clients.clients) do
+				client.timeout = client.timeout - update_rate
+				if client.timeout > 0 then
+					quit = false
+				end
+			end
+			if quit then
+				RUN = false
+				print('ALL CLIENTS TIMED OUT')
+			end
 		end
 
 		if tic_timer > tic_rate then

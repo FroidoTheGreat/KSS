@@ -1,5 +1,5 @@
 local Object = require 'Object'
-local v = require 'Vector'
+local V = require 'Vector'
 local Projectile = Object:extend()
 
 function Projectile:new(t)
@@ -10,18 +10,26 @@ function Projectile:new(t)
 	t.pos = t.pos or {}
 	t.dir = t.dir or {}
 
-	self.pos = v(t.pos.x or 0, t.pos.y or 0)
-	self.dir = v(t.dir.x or 0, t.dir.y or 0)
+	self.pos = V(t.pos.x or 0, t.pos.y or 0)
+	self.dir = V(t.dir.x or 0, t.dir.y or 0)
 
 	self.speed = t.speed or 100
 
 	self.timer = t.timer or 1
 
+	self.damage = t.damage or 5
+
+	if t.vel then
+		self.vel = V(t.vel.x or 0, t.vel.y or 0)
+	else
+		self.vel = self.dir * self.speed
+	end
+
 	self.owner_id = t.owner_id
 end
 
 function Projectile:update(dt)
-	self.pos = self.pos + self.dir * dt * self.speed
+	self.pos = self.pos + self.vel * dt
 end
 
 return Projectile
