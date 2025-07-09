@@ -33,6 +33,8 @@ function love.load()
 	client.load()
 
 	world = World()
+
+	render.load()
 end
 
 function love.update(dt)
@@ -57,7 +59,13 @@ function love.update(dt)
 				end
 			end
 
+			if world.me then
+				controller.update(world.me, render.getOffset())
+			end
+
 			world:update(dt)
+
+			render.update(dt, world)
 		end
 	elseif CONNECTED then
 
@@ -71,9 +79,6 @@ end
 function love.draw()
 	if STARTED then
 		if world then
-			if world.me then
-				controller.update(world.me, render.getOffset())
-			end
 			render.draw(world)
 		end
 	elseif CONNECTED then

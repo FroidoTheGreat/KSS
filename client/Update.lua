@@ -40,14 +40,13 @@ function Update:resolve(world)
 end
 
 function Update:load(world)
-	for _, datum in ipairs(self.data.items) do
-		if datum.typ and datum.id then
-			local class = objects.get(datum.typ)
-			if class then
-				world:add(class(datum), datum.id)
-			end
-		end
+	-- map
+	if not self.data.level_name then
+		print('did not receive level name from server... loading example level')
+		self.data.level_name = '1'
 	end
+	world.level_name = self.data.level_name
+	world:load_level(self.data.level_name, self.data.num_players)
 
 	world.started = true
 end

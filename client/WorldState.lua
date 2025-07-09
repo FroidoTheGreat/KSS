@@ -67,6 +67,12 @@ function WorldState:new(world, settings)
 			table.insert(self.data.items, datum)
 		end
 	end
+
+	-- map
+	if self.data.H == 'load' then
+		self.data.level_name = world.level_name or '1'
+		self.data.num_players = #world.players
+	end
 end
 
 function WorldState:find_by_id(id)

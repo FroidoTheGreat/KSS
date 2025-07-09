@@ -41,11 +41,24 @@ local fetch = function(name)
 	return images
 end
 
+-- FIXME: all sprites should be 'folders'
 function Sprite:new(name, t)
 	t = t or {}
 	self.image = fetch(name)
 
-	self.width, self.height = self.image:getPixelDimensions()
+	self.is_sprite = false
+
+	local image = self.image
+	if type(self.image) == 'table' then
+		self.is_sprite = true
+
+		for _, v in pairs(self.image) do
+			image = v
+			break
+		end
+	end
+
+	self.width, self.height = image:getPixelDimensions()
 	if t.no_center then
 		self.off = V(0, 0)
 	else
@@ -53,8 +66,12 @@ function Sprite:new(name, t)
 	end
 end
 
-function Sprite:draw(x, y)
-	love.graphics.draw(self.image, math.floor(x + 0.5 - self.off.x), math.floor(y + 0.5 - self.off.y))
+function Sprite:draw(x, y, frame)
+	local image = self.image
+	if self.is_sprite then
+		image = image[tostring(frame)]
+	end
+	love.graphics.draw(image, math.floor(x + 0.5 - self.off.x), math.floor(y + 0.5 - self.off.y))
 end
 
 return Sprite

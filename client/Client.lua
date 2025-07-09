@@ -25,6 +25,7 @@ end
 
 function Client:assign_player(player)
 	self.player = player
+	player.controls = self.controls
 	self:send_udp({
 		H = 'me',
 		id = player.id

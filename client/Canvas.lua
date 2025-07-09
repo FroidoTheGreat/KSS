@@ -1,9 +1,11 @@
 local Object = require 'Object'
+local V = require 'Vector'
 local Canvas = Object:extend()
 
 function Canvas:new(w, h, background_color)
 	self.width = w
 	self.height = h
+	self.dim = V(w, h)
 
 	self.background_color = background_color
 

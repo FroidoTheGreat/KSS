@@ -25,7 +25,7 @@ function s:post_update(dt, world)
 			},
 			timer = 0.5,
 			owner_id = self.id,
-			damage = 2,
+			damage = 4,
 		})) -- create a new projectile!
 	end
 

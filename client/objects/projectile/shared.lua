@@ -1,4 +1,5 @@
 local Object = require 'Object'
+local physics = require 'physics'
 local V = require 'Vector'
 local Projectile = Object:extend()
 
@@ -26,10 +27,15 @@ function Projectile:new(t)
 	end
 
 	self.owner_id = t.owner_id
+
+	physics.load(self, {
+		radius = 10,
+		collision_type = 'bounce'
+	})
 end
 
-function Projectile:update(dt)
-	self.pos = self.pos + self.vel * dt
+function Projectile:update(dt, world)
+	physics.move(self, self.vel * dt, world)
 end
 
 return Projectile

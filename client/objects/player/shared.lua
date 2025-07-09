@@ -1,5 +1,6 @@
 local Object = require 'Object'
 local V = require 'Vector'
+local physics = require 'physics'
 local Player = Object:extend()
 
 function Player:new(t, y)
@@ -38,10 +39,15 @@ function Player:new(t, y)
 
 	self.invulnerable = 0
 	self.invulnerable_timer = 0.3
+
+	physics.load(self, {
+		radius = 25,
+		collision_type = 'bounce'
+	})
 end
 
 local C = 1 / math.sqrt(2)
-function Player:update(dt)
+function Player:update(dt, world)
 	if self.life <= 0 then return end
 	self.vel = V(0, 0)
 
@@ -67,7 +73,7 @@ function Player:update(dt)
 
 	self.invulnerable = self.invulnerable - dt
 
-	self.pos = self.pos + self.vel * dt
+	physics.move(self, self.vel * dt, world)
 end
 
 return Player

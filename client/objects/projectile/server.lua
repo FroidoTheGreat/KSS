@@ -7,7 +7,7 @@ function s:post_update(dt, world)
 		return
 	end
 
-	for _, other in ipairs(world.items) do
+	for _, other in pairs(world.items) do
 		if other.id ~= self.id then
 			-- square of combined radii
 			local rad2 = ((self.radius or 10) + (other.radius or 50)) ^ 2
@@ -26,6 +26,10 @@ end
 
 function s:hit(other)
 	
+end
+
+function s:wall(num_collisions)
+	--self.purge = true
 end
 
 return s

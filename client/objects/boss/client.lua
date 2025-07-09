@@ -22,7 +22,7 @@ function s:draw()
 	Color(255, 100, 100):normal():set()
 	if self.life then
 		local width = math.max(0, self.life / 2)
-		love.graphics.rectangle('fill', self.pos.x - width/2, self.pos.y - 55, width, 5)
+		love.graphics.rectangle('fill', self.pos.x - width/2, self.pos.y - 45, width, 5)
 	end
 end
 

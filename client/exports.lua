@@ -8,7 +8,7 @@ return {
 	},
 	boss = {
 		'life',
-		'dir',
+		'vel',
 		'stage'
 	}
 }
