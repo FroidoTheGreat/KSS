@@ -10,6 +10,8 @@ function physics.load(object, settings)
 	object.hitbox_radius = settings.radius or 20
 	object.collision_type = settings.collision_type or 'slide'
 	object.bounce_damping = settings.bounce_damping or 1
+	object.entity_collision = settings.entity_collision or false
+	object.entity_collision_type = settings.entity_collision_type or false
 end
 
 function physics.move(object, vel, world)
@@ -20,7 +22,7 @@ function physics.move(object, vel, world)
 	local total_movement_portion = 0
 	local iteration = 0
 	while (total_movement_portion < 1) and (iteration < MAX_ITERATIONS) do
-		local collision, t, A, B, normal = physics.find_first_wall(object, vel, borders)
+		local collision, t, A, B, normal, other = physics.find_first_wall(object, vel, borders)
 
 		if collision then
 			num_collisions = num_collisions + 1
@@ -31,6 +33,9 @@ function physics.move(object, vel, world)
 			if object.collision_type == 'slide' then
 				vel = vel - normal * (vel * normal)
 				vel = vel * (1 - t)
+				if object.vel then
+					object.vel = V(0,0)
+				end
 			elseif object.collision_type == 'bounce' then
 				vel = (vel - normal * 2 * (vel * normal)) * object.bounce_damping
 				if object.vel then
@@ -52,9 +57,9 @@ function physics.move(object, vel, world)
 	end
 end
 
-function physics.find_first_wall(object, vel, borders)
+function physics.find_first_wall(object, vel, borders, objects)
 	local min_t = 1
-	local min_A, min_B, min_normal
+	local min_A, min_B, min_normal, min_other
 	local has_collision
 	local A, B
 	local collision, t, normal
@@ -86,7 +91,7 @@ function physics.find_first_wall(object, vel, borders)
 			end
 		end
 	end
-	return has_collision, min_t, min_A, min_B, min_normal
+	return has_collision, min_t, min_A, min_B, min_normal, min_other
 end
 
 function physics.check_point_collision(object, vel, A)

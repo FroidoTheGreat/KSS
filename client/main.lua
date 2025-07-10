@@ -88,6 +88,7 @@ function love.draw()
 	else
 		love.graphics.print("waiting for server connection...", 10, 10)
 	end
+	love.graphics.print(love.timer.getFPS(), 10, 10)
 end
 
 function love.quit()

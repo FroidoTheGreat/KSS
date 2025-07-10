@@ -48,11 +48,9 @@ function client.request_connection(dt)
 	client.request_timer = client.request_timer + client.request_timeout
 
 	-- send the request to the server
-	local d = {
+	net.send_udp({
 		H = 'connect'
-	}
-	local datagram = data.pack(d)
-	net.send_udp(datagram)
+	})
 end
 
 function client.receive_updates()

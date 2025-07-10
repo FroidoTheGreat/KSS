@@ -53,7 +53,7 @@ function World:load_level(name, num_players)
 	self.map = Map(name)
 	local data = self.map.data
 
-	for i=1, num_players do
+	for i=1, num_players or 0 do
 		local spawn = data.spawns[i]
 		self:add(objects.get('player')({
 			x = spawn.x,

@@ -4,6 +4,7 @@ local serpent = require 'serpent'
 local exports = require 'exports'
 local WorldState = Object:extend()
 
+-- FIXME: this is weird about loading
 function WorldState:new(world, settings)
 	settings = settings or {}
 	self.settings = settings
@@ -29,10 +30,7 @@ function WorldState:new(world, settings)
 		-- include the basic necessities (defaults)
 		datum.id = object.id
 		if object.pos then
-			datum.pos = {
-				x = object.pos.x,
-				y = object.pos.y
-			}
+			datum.pos = object.pos
 		end
 
 		-- include that which is shared between server and client
@@ -42,12 +40,11 @@ function WorldState:new(world, settings)
 				local value = object[export]
 				if value then
 					if type(value) == 'table' and value.isVector then
-						datum[export] = {
-							x = value.x,
-							y = value.y
-						}
+						datum[export] = value
 					elseif type(value) ~= 'table' then
 						datum[export] = value
+					else
+						error('can\'t just be adding a table, now can we?')
 					end
 				end
 			end

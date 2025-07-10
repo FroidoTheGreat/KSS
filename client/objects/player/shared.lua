@@ -42,7 +42,8 @@ function Player:new(t, y)
 
 	physics.load(self, {
 		radius = 25,
-		collision_type = 'bounce'
+		entity_collision = true,
+		entity_collision_type = 'static',
 	})
 end
 

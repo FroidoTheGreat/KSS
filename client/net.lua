@@ -47,6 +47,10 @@ function net.sendto(s, address)
 	if type(s) == 'table' then
 		s = data.pack(s)
 	end
+	--[[local prcnt = math.floor( 100 * 100 * ((#s)/8000) ) / 100
+	if prcnt > 0.1 then
+		print(prcnt)
+	end]]
 	if address.host then
 		net.output:push(s)
 	else

@@ -115,6 +115,7 @@ while RUN do
 		end
 	end
 
+	-- FIXME: what the heck is happening here?
 	-- control time and updates
 	time = net.sock.gettime()
 	dt = time - last_time
@@ -123,9 +124,11 @@ while RUN do
 	tic_timer = tic_timer + dt
 
 	if game.started then
-		while update_timer > update_rate do
-			update_timer = update_timer - update_rate
-			game.update(update_rate)
+		if update_timer > update_rate then
+			io.write('\r', update_timer)
+			io.flush()
+			game.update(update_timer)
+			update_timer = 0
 
 			local quit = true
 			for _, client in ipairs(clients.clients) do
@@ -154,5 +157,5 @@ while RUN do
 		game.load()
 	end
 
-	net.sock.sleep(0.001)
+	-- net.sock.sleep(0.001)
 end

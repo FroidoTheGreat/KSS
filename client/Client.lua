@@ -1,6 +1,7 @@
 local Object = require 'Object'
 local serpent = require 'serpent'
 local net = require 'net'
+local data = require 'data'
 local Client = Object:extend()
 
 function Client:new(address, tcp)
@@ -34,7 +35,7 @@ end
 
 function Client:send_udp(datagram)
 	if type(datagram) == 'table' then
-		datagram = serpent.dump(datagram)
+		datagram = data.pack(datagram)
 	end
 	net.sendto(datagram, self.address)
 end

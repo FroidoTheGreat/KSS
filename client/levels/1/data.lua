@@ -41,7 +41,7 @@ return {
 				}
 			}
 		},
-		--[[{
+		{
 			typ = 'boss',
 			t = {
 				pos = {
@@ -85,7 +85,7 @@ return {
 					y = 198
 				}
 			}
-		},]]
+		},
 	},
 	borders = {
 		{

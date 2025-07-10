@@ -23,6 +23,8 @@ function Boss:new(t)
 		radius = 35,
 		collision_type = 'bounce',
 		bounce_damping = 0.8,
+		entity_collision = true,
+		entity_collision_type = 'bounce',
 	})
 end
 

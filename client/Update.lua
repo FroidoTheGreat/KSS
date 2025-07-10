@@ -1,16 +1,18 @@
 local Object = require 'Object'
-local v = require 'Vector'
+local V = require 'Vector'
 local serpent = require 'serpent'
 local data = require 'data'
 local Update = Object:extend()
 local render = require 'render'
 local net = require 'net'
+local physics = require 'physics'
 
 local objects = require('objects')
 
+local count = 0
 function Update:new(datagram)
+	count = count + 1
 	self.data = data.unpack(datagram)
-	-- print(serpent.block(self.data))
 
 	if (self.data.H == 'ERROR') or type(self.data) ~= 'table' then
 		self.data = {}
@@ -36,7 +38,7 @@ function Update:resolve(world)
 			world.me_id = d.id
 		end
 	else
-		print('unrecognized header: ' .. tostring(self.header))
+		-- print('unrecognized header: ' .. tostring(self.header))
 	end
 end
 
@@ -59,11 +61,7 @@ function Update:update(world)
 		if object then
 			for k, value in pairs(datum) do
 				if k ~= 'id' then
-					if type(value) ~= 'table' then
-						object[k] = value
-					else
-						object[k] = v(value.x or 0, value.y or 0)
-					end
+					object[k] = value
 				end
 			end
 		elseif datum.id then
