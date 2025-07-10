@@ -7,6 +7,10 @@ local Update = require 'Update'
 
 local udp
 
+
+local awaiting_ping
+local ping_timestamp
+
 local ip, port
 if net.settings.p2p then
 
@@ -37,6 +41,18 @@ function client.load()
 	client.request_timeout = 0.5
 
 	-- udp:send('oh hi mark!')
+
+	client.send_ping()
+end
+
+function client.send_ping()
+	print('sent ping!')
+	awaiting_ping = true
+	ping_timestamp = net.sock.gettime()
+	client.ping_timer = 1
+	net.send_udp({
+		H='ping'
+	})
 end
 
 function client.request_connection(dt)
@@ -60,7 +76,15 @@ function client.receive_updates()
 	repeat
 		d, msg = net.receive()
 		if d then
-			table.insert(cmds, Update(d))
+			local u = Update(d)
+
+			if u.header == 'ping' then
+				client.ping = net.sock.gettime() - ping_timestamp
+				awaiting_ping = false
+				print(client.ping)
+			else
+				table.insert(cmds, u)
+			end
 		else
 
 		end

@@ -107,6 +107,8 @@ while RUN do
 				client:send_udp({H='connected'})
 				-- FIXME: don't let just anyone in
 			end
+		elseif cmd.header == 'ping' then
+			net.sendto({H='ping'}, cmd.address)
 		else
 			client = clients.get(cmd.address)
 			if client then

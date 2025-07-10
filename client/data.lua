@@ -28,6 +28,8 @@ function data.pack(t)
 		buffer = data.pack_act(t)
 	elseif t.H == 'connect' then
 		buffer = data.pack_connect(t)
+	elseif t.H == 'ping' then
+		buffer = data.pack_ping(t)
 	else
 		error('cannot pack command because header '..tostring(t.H)..' is unknown')
 	end
@@ -40,6 +42,14 @@ function data.pack(t)
 	end
 
 	return s
+end
+
+function data.pack_ping(t)
+	local buffer = {}
+
+	a(buffer, 'P')
+
+	return buffer
 end
 
 function data.pack_act(t)
@@ -150,6 +160,8 @@ function data.unpack(s)
 		data.unpack_me(t, string.sub(s, 2))
 	elseif H == 'A' then
 		data.unpack_act(t, string.sub(s, 2))
+	elseif H == 'P' then
+		t.H = 'ping'
 	end
 	
 	return t

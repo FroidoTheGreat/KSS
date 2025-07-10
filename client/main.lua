@@ -26,7 +26,6 @@ local STARTED = false
 function love.load()
 	net.load()
 	udp = net.udp
-	tcp = net.tcp
 
 	client = require 'client_network'
 
@@ -38,6 +37,11 @@ function love.load()
 end
 
 function love.update(dt)
+	client.ping_timer = client.ping_timer - dt
+	if client.ping_timer < 0 then
+		client.send_ping()
+	end
+
 	local cmds = client.receive_updates()
 	for _, cmd in ipairs(cmds) do
 		cmd:resolve(world)
