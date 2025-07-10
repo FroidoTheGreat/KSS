@@ -12,7 +12,7 @@ local clear_color
 local canvas
 
 function render.load()
-	clear_color = Color('36363d')
+	clear_color = Color('35424d')
 	canvas = Canvas(400, 400)
 
 	render.camera = Camera(canvas)
@@ -39,24 +39,30 @@ function render.update(dt, world)
 	end
 end
 
+function render.load_level(name)
+	render.level_sprite = Sprite('levels.'..name, {no_center = true})
+end
+
 function render.draw(world)
 	canvas:set()
 
 	clear_color:clear()
 
-	-- draw bubbles
+	--[[ draw bubbles
 
 	for _, bubble in ipairs(render.bubbles) do
 		love.graphics.push()
 		render.camera:apply(bubble.depth)
 		render.bubble_sprite:draw(bubble.x, bubble.y, bubble.size)
 		love.graphics.pop()
-	end
+	end]]
 
 	-- draw world
 
 	love.graphics.push()
 	render.camera:apply()
+
+	render.level_sprite:draw(0, 0, 'background')
 
 	for _, object in pairs(world.items) do
 		if type(object.draw) == 'function' then
@@ -64,14 +70,18 @@ function render.draw(world)
 		end
 	end
 
-	-- draw boundaries
-
+	-- draw foreground
 	love.graphics.push()
 	Color(255, 255, 255):set()
+
+	render.level_sprite:draw(0, 0, 'foreground')
+
+	-- draw boundaries
+
 	love.graphics.setLineWidth(10)
 	love.graphics.setLineStyle('rough')
 
-	local map = world.map
+	--[[local map = world.map
 
 	for _, curve in ipairs(map.borders) do
 		for i=1, #curve do
@@ -83,7 +93,7 @@ function render.draw(world)
 
 			love.graphics.circle('fill', A.x, A.y, 5)
 		end
-	end
+	end]]
 
 	love.graphics.pop()
 

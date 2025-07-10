@@ -135,8 +135,8 @@ while RUN do
 				end
 			end
 			if quit then
-				RUN = false
-				print('ALL CLIENTS TIMED OUT')
+				--[[RUN = false
+				print('ALL CLIENTS TIMED OUT')]]
 			end
 		end
 

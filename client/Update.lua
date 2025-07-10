@@ -3,6 +3,7 @@ local v = require 'Vector'
 local serpent = require 'serpent'
 local data = require 'data'
 local Update = Object:extend()
+local render = require 'render'
 local net = require 'net'
 
 local objects = require('objects')
@@ -47,6 +48,7 @@ function Update:load(world)
 	end
 	world.level_name = self.data.level_name
 	world:load_level(self.data.level_name, self.data.num_players)
+	render.load_level(world.map.data.sprite)
 
 	world.started = true
 end
