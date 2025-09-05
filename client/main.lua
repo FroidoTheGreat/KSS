@@ -58,6 +58,7 @@ function love.update(dt)
 				if player and player.typ == 'player' then
 					world.me = player
 					player.controls = controller.actions
+					player.controller = controller
 				else
 					--print('no player object matching player id')
 				end

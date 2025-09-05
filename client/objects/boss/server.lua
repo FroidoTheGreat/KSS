@@ -5,16 +5,8 @@ local V = require 'Vector'
 local s = {}
 
 function s:post_load()
-	self:turn_to(math.random() * 2 * math.pi)
-
-	self.turn_speed = 1
-	self.turn_timer = 0
-
-	self.stage = 0
-
-	self.stage_timer = 60
-	self.passive_timeout = 3
-	self.shoot_timeout = 15
+	self.passive_timeout = 1.5
+	self.shoot_timeout = 5.5
 	self.bounce_timeout = 15
 
 	self.fire_timer = 0
@@ -25,6 +17,32 @@ function s:post_load()
 	self.damage = 20
 
 	self.awake = false
+
+	self.stage_timer = 5+math.random()*3
+	self.stage = 0
+	self.vel = V(600, 0)
+end
+
+function s:set_passive(world)
+	self.stage = 0
+	self.stage_timer = self.passive_timeout
+
+	-- find closest player and turn towards them
+	local min_player
+	local min_distance
+	for _, player in ipairs(world.players) do
+		local distance = (self.pos - player.pos):mag2()
+		if (distance < 500^2) and (player.life > 0) and ((not min_player) or (distance < min_distance)) then
+			min_player = player
+			min_distance = distance
+		end
+	end
+	self.vel = V(600, 0)
+	if min_player then
+		self:turn_to(min_player)
+	else
+		self:turn(math.random() * math.pi * 2)
+	end
 end
 
 function s:post_update(dt, world)
@@ -32,34 +50,16 @@ function s:post_update(dt, world)
 		self.purge = true
 	end
 
+	self.stage_timer = self.stage_timer - dt
 	if self.stage == 0 then -- passive
-		self.stage_timer = self.stage_timer - dt
 		if self.stage_timer <= 0 then
-			if (self.life <= 200) and (math.random() < (1 - self.life / 200)) then
-				self.vel = V(400, 0)
-				self:turn(math.random() * math.pi * 2)
-
-				self.stage = 2
-				self.stage_timer = self.bounce_timeout
-			else
-				self.vel = V(600, 0)
-				self:turn(math.random() * math.pi * 2)
-				
-				self.stage = 1
-				self.stage_timer = self.shoot_timeout
-			end
+			self.stage = 1
+			self.stage_timer = self.shoot_timeout
+			self.awake = true
 		end
 	elseif self.stage == 1 then
-		self.stage_timer = self.stage_timer - dt
 		if self.stage_timer <= 0 then
-			self.stage = 0
-			self.stage_timer = self.passive_timeout
-		end
-	elseif self.stage == 2 then
-		self.stage_timer = self.stage_timer - dt
-		if self.stage_timer <= 0 then
-			self.stage = 0
-			self.stage_timer = self.passive_timeout
+			self:set_passive(world)
 		end
 	end
 
@@ -95,6 +95,10 @@ function s:hit(other)
 		self.awake = true
 		self.stage_timer = 0
 	end
+end
+
+function s:wall()
+
 end
 
 return s

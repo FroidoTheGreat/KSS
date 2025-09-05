@@ -45,6 +45,9 @@ function Player:new(t, y)
 		entity_collision = true,
 		entity_collision_type = 'static',
 	})
+
+	self.projectile_damage = 10
+	self.projectile_speed = 800
 end
 
 local C = 1 / math.sqrt(2)

@@ -30,7 +30,7 @@ function Projectile:new(t)
 
 	physics.load(self, {
 		radius = 10,
-		collision_type = 'bounce'
+		--collision_type = 'bounce'
 	})
 end
 

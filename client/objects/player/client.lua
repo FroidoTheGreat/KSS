@@ -22,4 +22,42 @@ function s:draw()
 	end
 end
 
+function s:mouse_event(button, action)
+	if button == 1 then
+		if action.p then
+			local dir = (self.controller.mouse_p - self.pos):normal()
+			return {
+				H = 'act',
+				k = 'AB1',
+				x = dir.x,
+				y = dir.y
+			}
+		else
+			return {
+				H = 'unact',
+				k = 'AB1',
+			}
+		end
+	elseif button == 2 then
+		return s:mouse_2_event(action)
+	end
+end
+
+function s:mouse_2_event(action)
+	if action.p then
+		local pos = self.controller.mouse_p
+		return {
+			H = 'act',
+			k = 'AB2',
+			x = pos.x,
+			y = pos.y,
+		}
+	else
+		return {
+			H = 'unact'
+			k = 'AB2'
+		}
+	end
+end
+
 return s

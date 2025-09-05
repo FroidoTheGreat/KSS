@@ -32,6 +32,8 @@ function Boss:turn_to(angle)
 	if type(angle) == 'table' then
 		if angle.pos then
 			local dir = (angle.pos - self.pos):normal()
+			local magnitude = self.vel:magnitude()
+			self.vel = dir * magnitude
 		end
 		return
 	end

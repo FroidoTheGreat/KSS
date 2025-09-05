@@ -18,9 +18,10 @@ function WorldState:new(world, settings)
 		local datum = {}
 
 		-- only update what is changed
-		if last or self.data.H == 'load' then
+		local other
+		if last then
 			if last then
-				local other = last:find_by_id(object.id)
+				other = last:find_by_id(object.id)
 			end
 			if not other then -- FIXME: this is where I can do delta compression in the future
 				datum.typ = object.typ
@@ -37,14 +38,10 @@ function WorldState:new(world, settings)
 		-- this handles things other than the default
 		if exports[object.typ] then
 			for _, export in ipairs(exports[object.typ]) do
-				local value = object[export]
-				if value then
-					if type(value) == 'table' and value.isVector then
+				if (not other) or (other[export] ~= object[export]) then
+					local value = object[export]
+					if value then
 						datum[export] = value
-					elseif type(value) ~= 'table' then
-						datum[export] = value
-					else
-						error('can\'t just be adding a table, now can we?')
 					end
 				end
 			end

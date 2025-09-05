@@ -78,22 +78,28 @@ function render.draw(world)
 
 	-- draw boundaries
 
-	love.graphics.setLineWidth(10)
+	love.graphics.setLineWidth(1)
 	love.graphics.setLineStyle('rough')
 
-	--[[local map = world.map
+	local map = world.map
 
 	for _, curve in ipairs(map.borders) do
 		for i=1, #curve do
 			local A = curve[i]
 			if i < #curve then
 				local B = curve[i+1]
-				love.graphics.line(A.x, A.y, B.x, B.y)
+				-- love.graphics.line(A.x, A.y, B.x, B.y)
 			end
 
-			love.graphics.circle('fill', A.x, A.y, 5)
+			-- love.graphics.circle('fill', A.x, A.y, 5)
 		end
-	end]]
+	end
+
+	for _, object in pairs(world.items) do
+		if object.hitbox_radius then
+			-- love.graphics.circle('line', object.pos.x, object.pos.y, object.hitbox_radius)
+		end
+	end
 
 	love.graphics.pop()
 

@@ -127,8 +127,8 @@ while RUN do
 
 	if game.started then
 		if update_timer > update_rate then
-			io.write('\r', update_timer)
-			io.flush()
+			--[[io.write('\r', update_timer)
+			io.flush()]]
 			game.update(update_timer)
 			update_timer = 0
 

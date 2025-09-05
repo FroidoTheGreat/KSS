@@ -29,7 +29,7 @@ function s:hit(other)
 end
 
 function s:wall(num_collisions)
-	--self.purge = true
+	self.purge = true
 end
 
 return s

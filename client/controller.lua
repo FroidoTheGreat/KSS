@@ -22,7 +22,7 @@ C.keyboard = {
 }
 
 C.mouse = {
-	'AB1'
+	'AB1',
 }
 
 C.mouse_p = V(0, 0)
@@ -49,28 +49,27 @@ function C.update(me, offx, offy, scale)
 	for button, v in pairs(C.mouse) do
 		local isDown = love.mouse.isDown(button)
 		local action = C.actions[v]
-		if true then
+
+		if isDown or (action.p ~= isDown) then
 			action.p = isDown
-			if isDown then
-				local dir = (C.mouse_p - me.pos):normal()
-				action.x, action.y = dir.x, dir.y
-				local msg = { -- FIXME: direction should be
-							  -- based on the absolute position of the mouse
-					H = 'act',
-					k = v,
-					x = action.x,
-					y = action.y
-				}
-				net.send_udp(msg)
-			else
-				local msg = {
-					H = 'unact',
-					k = v
-				}
+
+			local msg = me:mouse_event(button, action)
+			if msg then
 				net.send_udp(msg)
 			end
 		end
 	end
 end
+
+--[[
+local dir = (C.mouse_p - me.pos):normal()
+action.x, action.y = dir.x, dir.y
+local msg = {
+	H = 'act',
+	k = v,
+	x = action.x,
+	y = action.y
+}
+]]
 
 return C

@@ -46,7 +46,7 @@ function client.load()
 end
 
 function client.send_ping()
-	print('sent ping!')
+	-- print('sent ping!')
 	awaiting_ping = true
 	ping_timestamp = net.sock.gettime()
 	client.ping_timer = 1
@@ -81,7 +81,7 @@ function client.receive_updates()
 			if u.header == 'ping' then
 				client.ping = net.sock.gettime() - ping_timestamp
 				awaiting_ping = false
-				print(client.ping)
+				-- print(client.ping)
 			else
 				table.insert(cmds, u)
 			end

@@ -2,7 +2,10 @@ local objects = {}
 local names = {
 	'player',
 	'projectile',
-	'boss'
+	'boss',
+	'player_blue',
+	'player_green',
+	'player_green',
 }
 
 local map = {}
